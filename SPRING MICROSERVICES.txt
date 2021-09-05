@@ -1,0 +1,26 @@
+curl -sSL https://zipkin.io/quickstart.sh | bash -s
+set RABBIT_URI=amqp://localhost
+java -jar zipkin.jar
+
+localhost:8761 - Eureka
+localhost:9411 - Zipkin
+
+Zuul - 8765
+
+http://localhost:8100/currency-converter-feign/from/USD/to/INR/quantity/1000
+
+import org.springframework.hateoas.EntityModel; 
+import org.springframework.hateoas.server.mvc.ControllerLinkBuilder;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+@GetMapping("/users/{id}")
+public EntityModel<User> retrieveUser(@PathVariable int id) {
+	User user = service.findOne(id);
+	if (user == null) {
+		throw new UserNotFoundException("id-" + id);
+	}
+	EntityModel<User> model = EntityModel.of(user);
+	WebMvcLinkBuilder linkTo = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(this.getClass()).retrieveAllUsers());
+	model.add(linkTo.withRel("all-users"));
+	return model;
+}
